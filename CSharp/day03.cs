@@ -4,7 +4,7 @@ using FluentAssertions;
 using NUnit.Framework;
 
 /// <summary>
-/// Theme: 
+/// Theme: optimizing battery joltages
 /// </summary>
 [TestFixture]
 public class Day03
