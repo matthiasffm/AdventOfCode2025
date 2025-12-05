@@ -33,7 +33,7 @@ public class Day04
         var map = ParseData(data);
 
         Puzzle1(map).Should().Be(13);
-        Puzzle2(map).Should().Be(43);
+        Puzzle2(map, false).Should().Be(43);
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class Day04
         var map  = ParseData(data);
 
         Puzzle1(map).Should().Be(1428);
-        Puzzle2(map).Should().Be(8936);
+        Puzzle2(map, false).Should().Be(8936);
     }
 
     // All of the Elves forklifts are busy moving rolls of paper around. You need to help them optimize the work the forklifts are doing.
@@ -63,7 +63,7 @@ public class Day04
     // accessible by a forklift.
     //
     // Puzzle == Start with your original map. How many rolls of paper in total can be removed by the Elves and their forklifts?
-    private static int Puzzle2(byte[,] map)
+    private static int Puzzle2(byte[,] map, bool dumpMapsToImages)
     {
         var neighborCounts = CreateMapWithNeighborCount(map);
 
@@ -74,8 +74,15 @@ public class Day04
         // it is not neccessary to recalculate the whole map. only the neighbors of removed paper rolls have to be recalculated and considered for
         // removal in the next iteration. 
 
+        var iteration = 0;
+
         do
         {
+            if(dumpMapsToImages)
+            {
+                FileUtils.WriteMapToPngImage(map, $"map{iteration.ToString("D5")}.png");
+            }
+
             if(toRemove.Length == 0)
             {
                 return removed.Count;
@@ -111,6 +118,8 @@ public class Day04
             }
 
             toRemove = toRemoveInThisIteration.Select(pos => (0, pos.Row, pos.Col)).ToArray();
+
+            iteration++;
         }
         while(true);
     }
