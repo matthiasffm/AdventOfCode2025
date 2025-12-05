@@ -3,7 +3,6 @@ namespace AdventOfCode2025;
 using FluentAssertions;
 using NUnit.Framework;
 
-using matthiasffm.Common.Collections;
 using matthiasffm.Common.Math;
 
 /// <summary>
@@ -70,46 +69,31 @@ public class Day05
     {
         // merge ranges
 
-        bool merged;
-        do
+        var sortedRanges = new LinkedList<(long start, long end)>(freshIngredients.OrderBy(ingredient => ingredient.start));
+
+        var iter = sortedRanges.First!;
+        while(iter.Next != null)
         {
-            merged = false;
+            var next = iter.Next;
 
-            // worse than O(n²)?
-            // faster => sort ranges by start and insert them in a linked list
-            //           every iteration try to merge two adjacent items in the list
-            //           nothing to merge anymore => end
-            //           (and if start1 < start2 is guaranteed intersect is when end1 > start2)
-
-            var mergedRanges = new HashSet<(long start, long end)>(freshIngredients);
-
-            foreach(var pair in freshIngredients.Variations())
+            if(RangesIntersect(iter.Value, next.Value))
             {
-                if(RangesIntersect(pair.Item1, pair.Item2))
-                {
-                    var mergedRange = MergeRanges(pair.Item1, pair.Item2);
-                    mergedRanges.Remove(pair.Item1);
-                    mergedRanges.Remove(pair.Item2);
-                    mergedRanges.Add(mergedRange);
-
-                    merged = true;
-
-                    break;
-                }
+                iter.Value = MergeRanges(iter.Value, next.Value);
+                sortedRanges.Remove(next);
             }
-
-            freshIngredients = mergedRanges;
+            else
+            {
+                iter = next;
+            }
         }
-        while(merged == true);
 
         // sum merged range sizes
 
-        return freshIngredients.Sum(range => range.end - range.start + 1);
+        return sortedRanges.Sum(range => Math.Abs(range.end - range.start) + 1);
     }
 
     private static bool RangesIntersect((long start, long end) left, (long start, long end) right)
-        => left.start.Between(right.start, right.end) ||
-           left.end.Between(right.start, right.end);
+        => left.end >= right.start;
 
     private static (long start, long end) MergeRanges((long start, long end) left, (long start, long end) right)
         => (Math.Min(left.start, right.start), Math.Max(left.end, right.end));
