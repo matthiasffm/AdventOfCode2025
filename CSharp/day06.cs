@@ -7,7 +7,7 @@ using System.Diagnostics;
 using matthiasffm.Common.Math;
 
 /// <summary>
-/// Theme: 
+/// Theme: solving Cephalopod math worksheets
 /// </summary>
 [TestFixture]
 public class Day06
