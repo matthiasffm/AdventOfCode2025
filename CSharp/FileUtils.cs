@@ -1,7 +1,6 @@
 namespace AdventOfCode2025;
 
-using SkiaSharp;
-using System.Numerics;
+using matthiasffm.Common.Math;
 
 public static class FileUtils
 {
@@ -54,44 +53,5 @@ public static class FileUtils
                      .Split("##", StringSplitOptions.RemoveEmptyEntries)
                      .Select(s => s.Split('#', StringSplitOptions.RemoveEmptyEntries)
                                    .Select(elem => ElementConverter(elem)));
-    }
-
-    // dump map to PNG file
-    public static void WriteMapToPngImage<T>(T[,] map, string path) where T: INumber<T>
-    {
-        // convert map to image with fat 2x2 pixels
-
-        var height = map.GetLength(0);
-        var width  = map.GetLength(1);
-
-        var pixels = new SKColor[height * width * 4];
-
-        var foreColor = new SKColor(50, 200, 50);
-        var backColor = new SKColor(0, 0, 0);
-
-        for(var row = 0; row < height; row++)
-        {
-            for(var col = 0; col < width; col++)
-            {
-                pixels[row * 4 * width + col * 2] =
-                pixels[row * 4 * width + col * 2 + 1] =
-                pixels[row * 4 * width + col * 2 + width * 2] =
-                pixels[row * 4 * width + col * 2 + width * 2 + 1] = map[row, col] == default ? backColor : foreColor;
-            }
-        }
-
-        // dump pixels to png file
-
-        var bitmap = new SKBitmap(width * 2, height * 2)
-        {
-            Pixels = pixels
-        };
-
-        using MemoryStream memStream = new();
-        using SKManagedWStream wstream = new(memStream);
-        bitmap.Encode(wstream, SKEncodedImageFormat.Png, 0);
-        byte[] pgnBytes = memStream.ToArray();
-
-        File.WriteAllBytes(path, pgnBytes);
     }
 }

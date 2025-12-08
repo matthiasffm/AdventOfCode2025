@@ -42,7 +42,7 @@ public class Day07
         var splitters = ParseData(data);
 
         Puzzle1(splitters, data[0].IndexOf('S')).Should().Be(21);
-        Puzzle2(splitters, data[0].IndexOf('S')).Should().Be(40L);
+        Puzzle2(splitters, data[0].IndexOf('S'), false).Should().Be(40L);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class Day07
         var splitters = ParseData(data);
 
         Puzzle1(splitters, data[0].IndexOf('S')).Should().Be(1507);
-        Puzzle2(splitters, data[0].IndexOf('S')).Should().Be(1537373473728L);
+        Puzzle2(splitters, data[0].IndexOf('S'), false).Should().Be(1537373473728L);
     }
 
     // You quickly locate a diagram of the tachyon manifold (your puzzle input). A tachyon beam enters the manifold at the location marked S; tachyon beams always
@@ -71,7 +71,7 @@ public class Day07
     // To fix the manifold, what you really need to know is the number of timelines active after a single particle completes all of its possible journeys through the manifold.
     //
     // Puzzle == Apply the many-worlds interpretation of quantum tachyon splitting to your input. How many different timelines would a single tachyon particle end up on?
-    private static long Puzzle2((int Row, int Col)[] splitters, int startCol)
+    private static long Puzzle2((int Row, int Col)[] splitters, int startCol, bool drawHeatmap)
     {
         var allSplitters = UsedSplitters(splitters, startCol).ToHashSet();
 
@@ -80,21 +80,40 @@ public class Day07
         // and if there is no splitter
         // timelines(col, row + 1) = timelines(col, row)
 
-        var timelines = new long[splitters.Max(s => s.Col) + 2];
-        timelines[startCol] = 1L;
+        var maxRows = splitters.Max(s => s.Row);
+        var maxCols = splitters.Max(s => s.Col) + 2;
+
+        var timelines = new long[maxCols];
+        timelines[startCol] = 1;
 
         var nextTimelines = new long[timelines.Length];
 
-        for(int row = 1; row <= splitters.Max(s => s.Row); row++)
+        long[,] heatMap = {};
+        if(drawHeatmap == true)
+        {
+            heatMap = new long[maxRows, maxCols];
+        }
+
+        for(int row = 1; row <= maxRows; row++)
         {
             for(int col = 0; col < timelines.Length; col++)
             {
-                nextTimelines[col] = (allSplitters.Contains((row, col - 1)) ? timelines[col - 1] : 0L) +
-                                     (allSplitters.Contains((row, col))     ? 0L : timelines[col]) +
-                                     (allSplitters.Contains((row, col + 1)) ? timelines[col + 1] : 0L);
+                nextTimelines[col] = (allSplitters.Contains((row, col - 1)) ? timelines[col - 1] : 0) +
+                                     (allSplitters.Contains((row, col))     ? 0 : timelines[col]) +
+                                     (allSplitters.Contains((row, col + 1)) ? timelines[col + 1] : 0);
+
+                if(drawHeatmap)
+                {
+                    heatMap[row - 1, col] = nextTimelines[col];
+                }
             }
 
             Swap(ref timelines, ref nextTimelines);
+        }
+
+        if(drawHeatmap)
+        {
+            VisualizationUtils.WriteHeatmapToPngImage(heatMap, "heatmap.png");
         }
 
         return timelines.Sum();

@@ -80,7 +80,7 @@ public class Day04
         {
             if(dumpMapsToImages)
             {
-                FileUtils.WriteMapToPngImage(map, $"map{iteration.ToString("D5")}.png");
+                VisualizationUtils.WriteMonochromeMapToPngImage(map, $"map{iteration.ToString("D5")}.png");
             }
 
             if(toRemove.Length == 0)
