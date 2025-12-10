@@ -7,7 +7,6 @@ using matthiasffm.Common.Math;
 
 public static class VisualizationUtils
 {
-
     // dump map to a PNG file where every value on the map gets a green 2x2 pixel
     public static void WriteMonochromeMapToPngImage<T>(T[,] map, string path) where T: INumber<T>
     {
@@ -35,6 +34,37 @@ public static class VisualizationUtils
         // dump pixels to png file
 
         var bitmap = new SKBitmap(width * 2, height * 2)
+        {
+            Pixels = pixels
+        };
+
+        using MemoryStream memStream = new();
+        using SKManagedWStream wstream = new(memStream);
+        bitmap.Encode(wstream, SKEncodedImageFormat.Png, 0);
+        byte[] pgnBytes = memStream.ToArray();
+
+        File.WriteAllBytes(path, pgnBytes);
+    }
+
+    // dump multicolor map to a PNG file
+    public static void WriteMulticolorMapToPngImage((byte Red, byte Green, byte Blue)[,] map, string path)
+    {
+        var height = map.GetLength(0);
+        var width  = map.GetLength(1);
+
+        var pixels = new SKColor[height * width];
+
+        for(var row = 0; row < height; row++)
+        {
+            for(var col = 0; col < width; col++)
+            {
+                pixels[row * width + col] = new SKColor(map[row, col].Red, map[row, col].Green, map[row, col].Blue);
+            }
+        }
+
+        // dump pixels to png file
+
+        var bitmap = new SKBitmap(width, height)
         {
             Pixels = pixels
         };
