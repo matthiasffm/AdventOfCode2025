@@ -72,14 +72,11 @@ public class Day08
     private static long Puzzle1(Coord[] junctionBoxes, int numberOfConnections, int largestCurcuitsToSum)
     {
         // first compute all distances between the junction boxes and take the numberOfConnections shortest of them
-        var distances = junctionBoxes.Variations()
+        var distances = junctionBoxes.TwoCombinations()
                                      .Select(boxes => (A: boxes.Item1, B: boxes.Item2, Distance: EuclidianDistance(boxes.Item1, boxes.Item2)))
                                      .OrderBy(boxPairs => boxPairs.Distance)
-                                     .Where((t, i) => i % 2 == 0) // removes permutations
                                      .Take(numberOfConnections)
                                      .ToArray();
-        // TODO: not variations/permutations but 2-combinations
-        //       this also should be addressed in common
 
         // with the n shortest distances build clusters from their connections
 
@@ -104,13 +101,10 @@ public class Day08
     //           if you multiply together the X coordinates of the last two junction boxes you need to connect?
     private static long Puzzle2(Coord[] junctionBoxes)
     {
-        var distances = junctionBoxes.Variations()
+        var distances = junctionBoxes.TwoCombinations()
                                      .Select(boxes => (A: boxes.Item1, B: boxes.Item2, Distance: EuclidianDistance(boxes.Item1, boxes.Item2)))
                                      .OrderBy(boxPairs => boxPairs.Distance)
-                                     .Where((t, i) => i % 2 == 0)
                                      .ToArray();
-        // TODO: not variations/permutations but 2-combinations
-        //       this also should be addressed in common
 
         var clusters       = new Dictionary<int, List<Coord>>();
         var clusterMapping = new Dictionary<Coord, int>();
